@@ -23,6 +23,7 @@ export type Heatmap = {
   cells: HeatCell[];
   levels: HeatLevel[];
   fetchedAt: number;
+  source?: "coinglass" | "binance-inferred";
 };
 
 type CgResp = {
@@ -79,7 +80,12 @@ export async function fetchHeatmap(
     cells,
     levels: extractYellowLevels(cells, markPrice),
     fetchedAt: Date.now(),
+    source: "coinglass",
   };
+}
+
+export function hasCoinglassKey(): boolean {
+  return !!process.env.COINGLASS_API_KEY;
 }
 
 // Collapse the time axis and pick the top-quantile price rows — the

@@ -3,7 +3,8 @@
 // and pushes a Farcaster notification to every subscriber.
 
 import { NextResponse } from "next/server";
-import { fetchHeatmap } from "@/lib/coinglass";
+import { fetchHeatmap, hasCoinglassKey } from "@/lib/coinglass";
+import { reconstructHeatmap } from "@/lib/reconstruct";
 import { fetchKlinesRange, fetchMarkPrice } from "@/lib/binance";
 import { detectSignal } from "@/lib/patterns";
 import { notifyAll } from "@/lib/notify";
@@ -20,8 +21,11 @@ export async function GET(req: Request) {
   const cooldownMin = Number(process.env.SIGNAL_COOLDOWN_MINUTES ?? 30);
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
 
+  const hmPromise = hasCoinglassKey()
+    ? fetchHeatmap("ETHUSDT", "24h").catch(() => reconstructHeatmap("ETHUSDT"))
+    : reconstructHeatmap("ETHUSDT");
   const [hm, klines, mark] = await Promise.all([
-    fetchHeatmap("ETHUSDT", "24h"),
+    hmPromise,
     fetchKlinesRange("ETHUSDT", "15m", 30),
     fetchMarkPrice("ETHUSDT"),
   ]);

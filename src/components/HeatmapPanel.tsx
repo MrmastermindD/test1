@@ -17,7 +17,9 @@ export function HeatmapPanel({ data }: { data: Heatmap | null }) {
             mark ${data.markPrice.toFixed(2)} · {data.levels.length} hot rows
           </div>
         </div>
-        <span className="pill">CoinGlass</span>
+        <span className="pill" title={data.source === "coinglass" ? "CoinGlass v4 heatmap" : "Inferred from Binance 24h wicks + volume nodes (no CoinGlass key set)"}>
+          {data.source === "coinglass" ? "CoinGlass" : "Binance · inferred"}
+        </span>
       </div>
       <div className="grid">
         <LevelList title="Short cluster (above)" side="short" levels={shorts} maxI={maxI} />
